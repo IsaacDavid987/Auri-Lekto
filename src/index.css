@@ -1,0 +1,29 @@
+:root {
+  --dark-blue: #0D1B2A;
+  --mid-blue: #1B263B;
+  --light-blue: #415A77;
+  --celeste: #778DA9;
+  --white: #E0E1DD;
+  --purple: #1f52df;
+
+  font-family: 'Outfit', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--dark-blue);
+  color: var(--white);
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
