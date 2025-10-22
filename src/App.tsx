@@ -1,18 +1,16 @@
-import React, { useState, useMemo, useRef, CSSProperties, FormEvent, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import type { CSSProperties, FormEvent } from 'react';
 import { FiChevronLeft, FiChevronRight, FiLogOut, FiVolume2 } from 'react-icons/fi';
 import { FaFacebook, FaWhatsapp, FaInstagram, FaEnvelope } from 'react-icons/fa';
 
-import { app } from "./firebaseConfig.ts";
+import "./firebaseConfig.ts";
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
 
 // Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/effect-fade';
+import 'swiper/swiper-bundle.css';
 
 import './App.css';
 
