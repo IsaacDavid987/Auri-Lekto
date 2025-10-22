@@ -1,0 +1,52 @@
+mutation CreateDemoData @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") @transaction {
+  language_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      name: "English",
+      isoCode: "en",
+      flagIconUrl: "https://example.com/flags/en.png"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440001",
+      name: "Spanish",
+      isoCode: "es",
+      flagIconUrl: "https://example.com/flags/es.png"
+    }
+  ])
+  course_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440002",
+      languageId: "550e8400-e29b-41d4-a716-446655440000",
+      title: "English for Beginners",
+      description: "A basic course for English learners",
+      level: "Beginner"
+      imageUrl: "https://example.com/courses/en_beginner.png"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440003",
+      languageId: "550e8400-e29b-41d4-a716-446655440001",
+      title: "Spanish for Beginners",
+      description: "A basic course for Spanish learners",
+      level: "Beginner"
+      imageUrl: "https://example.com/courses/es_beginner.png"
+    }
+  ])
+  lesson_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440004",
+      courseId: "550e8400-e29b-41d4-a716-446655440002",
+      title: "Introduction to English",
+      description: "First lesson in English",
+      contentUrl: "https://example.com/lessons/en_intro.html",
+      order: 1
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440005",
+      courseId: "550e8400-e29b-41d4-a716-446655440003",
+      title: "Introduction to Spanish",
+      description: "First lesson in Spanish",
+      contentUrl: "https://example.com/lessons/es_intro.html",
+      order: 1
+    }
+  ])
+}

@@ -1,18 +1,18 @@
-import React, { useState, useMemo, useRef, CSSProperties, FormEvent, useEffect } from 'react';
-import { FiChevronLeft, FiChevronRight, FiLogOut, FiVolume2 } from 'react-icons/fi';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import type { CSSProperties, FormEvent, ChangeEvent } from 'react';
+import { FiChevronLeft, FiChevronRight, FiLogOut, FiVolume2, FiSettings, FiX, FiImage } from 'react-icons/fi';
+
+import { getFirestore, doc, onSnapshot, setDoc } from "firebase/firestore";
 import { FaFacebook, FaWhatsapp, FaInstagram, FaEnvelope } from 'react-icons/fa';
 
-import { app } from "./firebaseConfig.ts";
+import "./firebaseConfig.ts";
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
 
 // Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/effect-fade';
+import 'swiper/swiper-bundle.css';
 
 import './App.css';
 
@@ -46,15 +46,36 @@ const LoginScreen = ({ onLoginSuccess }: { onLoginSuccess: () => void }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
+    // Obtener credenciales de localStorage o usar las por defecto
+    const getCredentials = () => {
+        const storedCreds = localStorage.getItem('auriLektoCreds');
+        if (storedCreds) {
+            return JSON.parse(storedCreds);
+        }
+        // Si no hay nada, se usan las de por defecto y se guardan
+        const defaultCreds = { username: 'admin', password: 'admin123' };
+        localStorage.setItem('auriLektoCreds', JSON.stringify(defaultCreds));
+        return defaultCreds;
+    };
+
     const handleLogin = (e: FormEvent) => {
         e.preventDefault();
-        if (username === 'admin' && password === 'admin123') {
+        const creds = getCredentials();
+        if (username === creds.username && password === creds.password) {
             setError('');
             onLoginSuccess();
         } else {
             setError('Usuario o contraseña incorrectos.');
         }
     };
+
+    // Efecto para inicializar las credenciales si no existen
+    useEffect(() => {
+        if (!localStorage.getItem('auriLektoCreds')) {
+            const defaultCreds = { username: 'admin', password: 'admin123' };
+            localStorage.setItem('auriLektoCreds', JSON.stringify(defaultCreds));
+        }
+    }, []);
 
     return (
         <div className="login-container">
@@ -65,15 +86,89 @@ const LoginScreen = ({ onLoginSuccess }: { onLoginSuccess: () => void }) => {
                 </div>
                 <div className="login-group">
                     <label htmlFor="username">Usuario</label>
-                    <input type="text" id="username" value={username} onChange={(e) => setUsername(e.target.value)} />
+                    <input type="text" id="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 </div>
                 <div className="login-group">
                     <label htmlFor="password">Contraseña</label>
-                    <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
                 {error && <p className="login-error">{error}</p>}
                 <button type="submit" className="login-button">Ingresar</button>
             </form>
+        </div>
+    );
+};
+
+// --- Componente de Modal de Configuración ---
+const SettingsModal = ({ onClose }: { onClose: () => void }) => {
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+
+    const handleChangePassword = (e: FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+
+        const storedCreds = localStorage.getItem('auriLektoCreds');
+        if (!storedCreds) {
+            setError("Error: No se encontraron credenciales.");
+            return;
+        }
+
+        const creds = JSON.parse(storedCreds);
+
+        if (currentPassword !== creds.password) {
+            setError("La contraseña actual es incorrecta.");
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            setError("La nueva contraseña debe tener al menos 6 caracteres.");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            setError("Las nuevas contraseñas no coinciden.");
+            return;
+        }
+
+        const newCreds = { ...creds, password: newPassword };
+        localStorage.setItem('auriLektoCreds', JSON.stringify(newCreds));
+        setSuccess("¡Contraseña actualizada con éxito!");
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setTimeout(() => {
+            onClose();
+        }, 2000);
+    };
+
+    return (
+        <div className="modal-overlay">
+            <div className="modal-content">
+                <button onClick={onClose} className="modal-close-button"><FiX /></button>
+                <h2>Cambiar Contraseña</h2>
+                <form onSubmit={handleChangePassword}>
+                    <div className="login-group">
+                        <label htmlFor="currentPassword">Contraseña Actual</label>
+                        <input type="password" id="currentPassword" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
+                    </div>
+                    <div className="login-group">
+                        <label htmlFor="newPassword">Nueva Contraseña</label>
+                        <input type="password" id="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
+                    </div>
+                    <div className="login-group">
+                        <label htmlFor="confirmPassword">Confirmar Nueva Contraseña</label>
+                        <input type="password" id="confirmPassword" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+                    </div>
+                    {error && <p className="login-error">{error}</p>}
+                    {success && <p className="login-success">{success}</p>}
+                    <button type="submit" className="login-button">Guardar Cambios</button>
+                </form>
+            </div>
         </div>
     );
 };
@@ -85,6 +180,7 @@ function App() {
   const [activeFilter, setActiveFilter] = useState<SectionFilter>('welcome');
   const [showEmail, setShowEmail] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   // ... (resto de los estados)
   const [message, setMessage] = useState('Tu Mensaje Creativo');
@@ -98,6 +194,8 @@ function App() {
   const [gradient, setGradient] = useState(true);
   const [gradientColor2, setGradientColor2] = useState('#0D1B2A');
   const [gradientAngle, setGradientAngle] = useState(145);
+  const [bgType, setBgType] = useState<'gradient' | 'image'>('gradient'); // 'gradient' o 'image'
+  const [bgImage, setBgImage] = useState<string | null>(null);
   const [marquee, setMarquee] = useState(true);
   const [marqueeSpeed, setMarqueeSpeed] = useState(20);
   const [marqueeDirection, setMarqueeDirection] = useState('normal');
@@ -108,6 +206,7 @@ function App() {
   const [isPresentationActive, setIsPresentationActive] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
   const presentationIntervalRef = useRef<number | null>(null);
+  const [applyButtonText, setApplyButtonText] = useState('Aplicar Cambios');
   const speechIntervalRef = useRef<number | null>(null);
 
 
@@ -194,6 +293,72 @@ function App() {
     return cleanupIntervals;
   }, []);
 
+  // --- Sincronización con Firestore ---
+  const db = getFirestore();
+  const styleDocRef = doc(db, "settings", "messageStyle");
+
+  // Efecto para LEER desde Firestore en tiempo real
+  useEffect(() => {
+    const unsubscribe = onSnapshot(styleDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setMessage(data.text || 'Tu Mensaje Creativo');
+        setTextColor(data.textColor || '#FFFFFF');
+        setFontSize(data.fontSize || 5);
+        setFontFamily(data.fontFamily || 'Outfit');
+        setTextShadow(data.textShadowEnabled ?? true);
+        setShadowColor(data.shadowColor || '#3170cfff');
+        setShadowBlur(data.shadowBlur || 10);
+        setBgColor(data.bgColor1 || '#1B263B');
+        setGradient(data.gradientEnabled ?? true);
+        setGradientColor2(data.bgColor2 || '#0D1B2A');
+        setGradientAngle(data.gradientAngle || 145);
+        setBgType(data.bgType || 'gradient');
+        setBgImage(data.bgImage || null);
+        setMarquee(data.animationEnabled ?? true);
+        setMarqueeSpeed(data.animationSpeed || 20);
+        setMarqueeDirection(data.animationDirection || 'normal');
+      }
+    });
+
+    // Limpiar el listener al desmontar el componente
+    return () => unsubscribe();
+  }, []); // El array vacío asegura que se ejecute solo una vez
+
+  // Efecto para ESCRIBIR en Firestore cuando el estado local cambia
+  const handleApplyChanges = async () => {
+    setApplyButtonText('Aplicando...');
+    const styleData = {
+        text: message, 
+        textColor, 
+        fontSize, 
+        fontFamily, 
+        textShadowEnabled: textShadow, 
+        shadowColor, shadowBlur, 
+        bgColor1: bgColor, 
+        gradientEnabled: gradient, 
+        bgColor2: gradientColor2, 
+        gradientAngle, 
+        bgType, bgImage,
+        animationEnabled: marquee, 
+        animationSpeed: marqueeSpeed, 
+        animationDirection: marqueeDirection };
+    
+    try {
+      await setDoc(styleDocRef, styleData);
+      setApplyButtonText('¡Aplicado!');
+      setTimeout(() => {
+        setApplyButtonText('Aplicar Cambios');
+      }, 2000);
+    } catch (error) {
+      console.error("Error al aplicar cambios: ", error);
+      setApplyButtonText('Error al aplicar');
+      setTimeout(() => {
+        setApplyButtonText('Aplicar Cambios');
+      }, 3000);
+    }
+  };
+
   const navItems = [
     { id: 'welcome', title: 'Bienvenida' },
     { id: 'designer', title: 'Diseñar Mensaje' },
@@ -216,10 +381,29 @@ function App() {
   }), [textColor, fontSize, fontFamily, textShadow, shadowColor, shadowBlur, marquee, marqueeSpeed, marqueeDirection]);
 
   const previewStyle: CSSProperties = useMemo(() => ({
-    background: gradient
-      ? `linear-gradient(${gradientAngle}deg, ${bgColor}, ${gradientColor2})`
-      : bgColor,
-  }), [gradient, gradientAngle, bgColor, gradientColor2]);
+    background: bgType === 'gradient'
+        ? (gradient ? `linear-gradient(${gradientAngle}deg, ${bgColor}, ${gradientColor2})` : bgColor)
+        : 'transparent',
+    backgroundImage: bgType === 'image' && bgImage ? `url(${bgImage})` : 'none',
+    backgroundSize: 'contain',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+  }), [bgType, bgImage, gradient, gradientAngle, bgColor, gradientColor2]);
+
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setBgImage(reader.result as string);
+            setBgType('image');
+        };
+        reader.readAsDataURL(file);
+    }
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const handleEnterFullscreen = () => {
     previewRef.current?.requestFullscreen();
@@ -239,12 +423,34 @@ function App() {
             </div>
             <h1 className="header-title">AuriLekto</h1>
             <div className="header-right">
+                <button className="logout-button" onClick={() => setIsSettingsModalOpen(true)} title="Configuración">
+                    Configuración
+                    <FiSettings style={{ marginLeft: '8px' }}/>
+                </button>
                 <button className="logout-button" onClick={handleLogout}>
                     Cerrar Sesión
                     <FiLogOut />
                 </button>
             </div>
         </header>
+
+      {/* Estilos para el efecto hover luminoso */}
+      <style>{`
+        .logout-button:hover,
+        .nav-item:hover,
+        .segmented-control button:hover,
+        .presentation-button:hover,
+        .apply-changes-button:hover,
+        .fullscreen-button:hover,
+        .speak-button:hover,
+        .social-link:hover,
+        .modal-close-button:hover,
+        .login-button:hover {
+          transition: all 0.3s ease;
+          box-shadow: 0 0 12px 3px rgba(0, 221, 255, 0.6);
+          transform: translateY(-2px);
+        }
+      `}</style>
 
       <nav className="navbar">
         {navItems.map(item => (
@@ -253,6 +459,8 @@ function App() {
           </button>
         ))}
       </nav>
+
+      {isSettingsModalOpen && <SettingsModal onClose={() => setIsSettingsModalOpen(false)} />}
 
       <main>
         <section id="welcome" className={`section ${isSectionVisible('welcome') ? 'visible' : ''}`}>
@@ -291,6 +499,14 @@ function App() {
                 <div className='control-group toggle-group'><label>Sombra de Texto / Efecto Neón</label><label className="switch"><input type="checkbox" checked={textShadow} onChange={(e) => setTextShadow(e.target.checked)} /><span className="slider round"></span></label></div>
                 {textShadow && <div className='animation-controls fadeIn-animation'><div className='control-row'><div className="control-group"><label>Color Sombra</label><input type="color" value={shadowColor} onChange={(e) => setShadowColor(e.target.value)} /></div><div className="control-group"><label>Desenfoque ({shadowBlur}px)</label><input type="range" min="0" max="50" value={shadowBlur} onChange={(e) => setShadowBlur(parseInt(e.target.value))} /></div></div></div>}
                 <div className='control-group-divider'></div>
+                <div className="control-group">
+                    <label>Tipo de Fondo</label>
+                    <div className='segmented-control'>
+                        <button className={bgType === 'gradient' ? 'active' : ''} onClick={() => setBgType('gradient')}>Color / Gradiente</button>
+                        <button className={bgType === 'image' ? 'active' : ''} onClick={() => fileInputRef.current?.click()}>Imagen</button>
+                        <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" style={{ display: 'none' }} />
+                    </div>
+                </div>
                 <div className='control-group toggle-group'><label>Fondo con Gradiente</label><label className="switch"><input type="checkbox" checked={gradient} onChange={(e) => setGradient(e.target.checked)} /><span className="slider round"></span></label></div>
                 <div className='animation-controls'><div className='control-row'><div className="control-group"><label>{gradient ? 'Color 1' : 'Color de Fondo'}</label><input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} /></div>{gradient && <div className="control-group fadeIn-animation"><label>Color 2</label><input type="color" value={gradientColor2} onChange={(e) => setGradientColor2(e.target.value)} /></div>}</div>{gradient && <div className="control-group fadeIn-animation"><label>Ángulo del Gradiente ({gradientAngle}°)</label><input type="range" min="0" max="360" value={gradientAngle} onChange={(e) => setGradientAngle(parseInt(e.target.value))} /></div>}</div>
                 <div className='control-group-divider'></div>
@@ -316,6 +532,10 @@ function App() {
                             {isPresentationActive ? `Detener (${remainingTime === Infinity ? '∞' : `${remainingTime}s`})` : 'Iniciar'}
                         </button>
                     </div>
+                </div>
+                <div className='control-group-divider'></div>
+                <div className="control-group">
+                    <button onClick={handleApplyChanges} className="apply-changes-button" disabled={applyButtonText !== 'Aplicar Cambios' && applyButtonText !== 'Error al aplicar'}>{applyButtonText}</button>
                 </div>
             </div>
             <div className="preview-panel">

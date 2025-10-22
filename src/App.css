@@ -41,6 +41,8 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  gap: 1rem;
 }
 .header-left {
   left: 2rem;
@@ -57,6 +59,8 @@
   font-size: 2.5rem;
   color: var(--white);
 }
+
+.settings-button,
 .logout-button {
   background-color: transparent;
   color: var(--celeste);
@@ -71,10 +75,21 @@
   gap: 0.5rem;
   transition: all 0.3s ease;
 }
+
+.settings-button:hover,
 .logout-button:hover {
   background-color: var(--celeste);
   color: var(--dark-blue);
 }
+
+.settings-button {
+    padding: 0.5rem; /* Make it more square */
+}
+
+.settings-button svg {
+    font-size: 1.2rem;
+}
+
 .navbar {
   display: flex;
   justify-content: center;
@@ -184,6 +199,7 @@ main {
 .control-row {
   display: flex;
   gap: 1rem;
+  align-items: center;
 }
 .control-row .control-group {
   flex: 1;
@@ -583,10 +599,140 @@ input:checked + .slider:before {
 .presentation-button.active {
   background-color: #e76f51; /* An orange/red color for 'active/stop' */
   color: var(--white);
-}g */
 }
 
 .presentation-button.active {
   background-color: #e76f51; /* An orange/red color for 'active/stop' */
   color: var(--white);
+}
+
+.apply-changes-button {
+  background-color: var(--purple);
+  color: var(--white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+/* --- Modal Styles --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background-color: var(--mid-blue);
+  padding: 2rem 3rem;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 500px;
+  border: 1px solid var(--light-blue);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content h2 {
+  color: var(--white);
+  margin-top: 0;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.modal-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.modal-button.cancel {
+  background-color: transparent;
+  border: 1px solid var(--light-blue);
+  color: var(--celeste);
+}
+
+.modal-button.cancel:hover {
+  background-color: var(--light-blue);
+  color: var(--dark-blue);
+}
+
+.modal-button.save {
+  background-color: var(--purple);
+  color: var(--white);
+}
+
+.modal-button.save:hover {
+  opacity: 0.9;
+}
+
+.login-success {
+    color: #25D366; /* WhatsApp green for success */
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+/* --- Image Upload Styles --- */
+.image-upload-button,
+.send-image-button {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-family: "Outfit", sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.image-upload-button {
+    background-color: var(--dark-blue);
+    border: 1px solid var(--light-blue);
+    color: var(--celeste);
+    flex-grow: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.image-upload-button:hover {
+    border-color: var(--celeste);
+}
+
+.send-image-button {
+    background-color: var(--purple);
+    color: var(--white);
+}
+
+.send-image-button:disabled {
+    background-color: var(--light-blue);
+    cursor: not-allowed;
+}
+
+.send-image-button:hover:not(:disabled) {
+    opacity: 0.9;
 }

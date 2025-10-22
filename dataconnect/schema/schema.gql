@@ -1,0 +1,57 @@
+type User @table {
+  username: String!
+  email: String!
+  passwordHash: String!
+  createdAt: Timestamp!
+  displayName: String
+  profilePictureUrl: String
+  preferredLanguage: Language
+}
+
+type Language @table {
+  name: String!
+  isoCode: String!
+  flagIconUrl: String
+}
+
+type Course @table {
+  title: String!
+  description: String!
+  language: Language!
+  level: String!
+  imageUrl: String
+}
+
+type Lesson @table {
+  title: String!
+  course: Course!
+  order: Int!
+  description: String
+  contentUrl: String
+}
+
+type VocabularyWord @table {
+  word: String!
+  translation: String!
+  language: Language!
+  pronunciationAudioUrl: String
+  exampleSentence: String
+}
+
+type UserProgress @table {
+  user: User!
+  lesson: Lesson!
+  course: Course!
+  status: String!
+  lastAccessedAt: Timestamp!
+  score: Int
+  masteryLevel: String
+}
+
+type UserLanguage @table {
+  user: User!
+  language: Language!
+  proficiencyLevel: String!
+  startedLearningAt: Timestamp!
+  currentCourse: Course
+}
