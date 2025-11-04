@@ -346,6 +346,7 @@ function App() {
     
     try {
       await setDoc(styleDocRef, styleData);
+      handleSpeak(); // Leer el mensaje en voz alta
       setApplyButtonText('¡Aplicado!');
       setTimeout(() => {
         setApplyButtonText('Aplicar Cambios');
@@ -378,6 +379,7 @@ function App() {
     fontFamily: `'${fontFamily}', sans-serif`,
     textShadow: textShadow ? `0 0 ${shadowBlur}px ${shadowColor}` : 'none',
     animation: marquee ? `marquee ${marqueeSpeed}s linear infinite ${marqueeDirection}` : 'none',
+    whiteSpace: marquee ? 'nowrap' : 'normal',
   }), [textColor, fontSize, fontFamily, textShadow, shadowColor, shadowBlur, marquee, marqueeSpeed, marqueeDirection]);
 
   const previewStyle: CSSProperties = useMemo(() => ({
@@ -385,7 +387,7 @@ function App() {
         ? (gradient ? `linear-gradient(${gradientAngle}deg, ${bgColor}, ${gradientColor2})` : bgColor)
         : 'transparent',
     backgroundImage: bgType === 'image' && bgImage ? `url(${bgImage})` : 'none',
-    backgroundSize: 'contain',
+    backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
   }), [bgType, bgImage, gradient, gradientAngle, bgColor, gradientColor2]);
@@ -571,10 +573,18 @@ function App() {
             >
                 {teamData.map(member => (
                     <SwiperSlide key={member.id}>
-                        <div className="team-member-card" style={{ backgroundImage: `url(${member.image})` }}>
+                        <div className="team-member-card">
+                            <img 
+                                src={member.image} 
+                                alt={member.name} 
+                                className="member-image" 
+                                style={{ 
+                                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 
+                                }} 
+                            />
                             <div className="member-info">
-                                <h3>{member.name}</h3>
-                                <p>{member.role}</p>
+                                <h3 style={{ color: 'white', textShadow: '0px 1px 4px rgba(0, 0, 0, 0.8)' }}>{member.name}</h3>
+                                <p style={{ color: 'white', textShadow: '0px 1px 4px rgba(0, 0, 0, 0.8)' }}>{member.role}</p>
                             </div>
                         </div>
                     </SwiperSlide>

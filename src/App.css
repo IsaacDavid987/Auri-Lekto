@@ -173,6 +173,9 @@ main {
   height: 450px; /* Fixed height */
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: 5rem;
+  min-width: 46%;
 }
 .control-group {
   margin-bottom: 1.5rem;
@@ -314,7 +317,6 @@ input:checked + .slider:before {
   padding: 1rem;
   text-align: center;
   transition: all 0.3s ease;
-  white-space: nowrap;
   display: inline-block;
 }
 .fullscreen-button {
