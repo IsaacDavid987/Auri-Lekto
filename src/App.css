@@ -437,19 +437,7 @@ input:checked + .slider:before {
   padding: 0;
 }
 .social-link:hover {
-  transform: scale(1.2);
-}
-.social-link.facebook:hover {
-  color: #1877f2;
-}
-.social-link.instagram:hover {
-  color: #e4405f;
-}
-.social-link.whatsapp:hover {
-  color: #25d366;
-}
-.social-link.email:hover {
-  color: #c71610;
+
 }
 .login-container {
   display: flex;

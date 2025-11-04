@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import type { CSSProperties, FormEvent, ChangeEvent } from 'react';
-import { FiChevronLeft, FiChevronRight, FiLogOut, FiVolume2, FiSettings, FiX, FiImage } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiLogOut, FiVolume2, FiSettings, FiX } from 'react-icons/fi';
 
 import { getFirestore, doc, onSnapshot, setDoc } from "firebase/firestore";
 import { FaFacebook, FaWhatsapp, FaInstagram, FaEnvelope } from 'react-icons/fa';
