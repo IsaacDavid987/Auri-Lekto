@@ -431,13 +431,37 @@ input:checked + .slider:before {
 .social-link {
   font-size: 2.5rem;
   color: var(--celeste);
-  transition: transform 0.3s ease, color 0.3s ease;
+  transition: transform 0.3s ease, color 0.3s ease, background-color 0.3s ease;
   background: none;
   border: none;
   padding: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.social-link:hover {
 
+.social-link:hover {
+  transform: translateY(-5px) scale(1.1);
+  background-color: rgba(255, 255, 255, 0.1); /* Subtle white background */
+}
+
+.social-link.facebook:hover {
+  color: #1877F2; /* Facebook Blue */
+}
+
+.social-link.instagram:hover {
+  color: #E4405F; /* Instagram Pink */
+}
+
+.social-link.whatsapp:hover {
+  color: #25D366; /* WhatsApp Green */
+}
+
+.social-link.email:hover {
+  color: #D44638; /* Red for email */
 }
 .login-container {
   display: flex;
